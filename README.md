@@ -1,6 +1,6 @@
 # Auto-PaLM
 
-Auto-PaLM (Automated Prompts and Learning Memory) is a Python-based AI Debugger program that leverages the power of generative AI to generate questions and answers based on user-defined prompts. The program also stores and manages the generated content in a memory system, allowing for context-aware responses and the ability to filter, archive, and retrieve information based on user input.
+Auto-PaLM (Automated Prompts and Learning Memory) is a Python-based AI program that leverages the power of generative AI to generate questions and answers based on user-defined prompts. The program also stores and manages the generated content in a memory system, allowing for context-aware responses and the ability to filter, archive, and retrieve information based on user input.
 
 ## Features
 
