@@ -65,5 +65,3 @@ I welcome contributions to improve the Auto-PaLM program. Please feel free to su
 This project, Auto-PaLM, was greatly inspired by [Auto-GPT: An Autonomous GPT-4 Experiment](https://github.com/Significant-Gravitas/Auto-GPT) by Significant Gravitas. Auto-GPT showcased the capabilities of the GPT-4 language model and served as one of the first examples of an autonomous AI application. I deeply appreciate the work and innovation demonstrated by Auto-GPT and its contributors, as it has truly been a driving force and motivation for the development of Auto-PaLM.
 
 We're excited to see how both Auto-PaLM and Auto-GPT will continue to push the boundaries of what is possible with AI in the future!
-
-![Star History Chart](https://api.star-history.com/svg?repos=Torantulino/auto-gpt&type=Date)
