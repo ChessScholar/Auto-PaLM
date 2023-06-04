@@ -17,17 +17,12 @@ Auto-PaLM (Automated Prompts and Learning Memory) is a Python-based AI program t
 pip install -r requirements.txt
 ```
 
-2. Run the `welcome_screen.py` script to set up your API key, memory settings, and other configurations:
-```
-python welcome_screen.py
-```
-
-3. Run the `main.py` script to start the Auto-PaLM program:
+2. Run the `main.py` script to start the Auto-PaLM program:
 ```
 python main.py
 ```
 
-4. Follow the on-screen prompts to set goals, enter prompts, and generate questions and answers.
+3. Follow the on-screen prompts to set goals, enter prompts, and generate questions and answers.
 
 ## Functions
 
