@@ -1,9 +1,9 @@
-Updated June 5,2023
+Updated June 5, 2023
 
 Current focus:
 - Correctly switching to google.generativeai functions instead of the mock-up functions provided by GPT-4 in its baby stages.
 
-- Refactoring all files to be easier to understand ehay each function does, and new files to shorten some of the larger ones.
+- Refactoring all files to be easier to understand what each function does, and new files to shorten some of the larger ones.
 
 - Allowing users to choose between API outputs (text or chat) at start-up.
 
