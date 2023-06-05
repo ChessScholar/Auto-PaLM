@@ -1,3 +1,17 @@
+Updated June 5,2023
+
+Current focus:
+- Correctly switching to google.generativeai functions instead of the mock-up functions provided by GPT-4 in its baby stages.
+
+- Refactoring all files to be easier to understand ehay each function does, and new files to shorten some of the larger ones.
+
+- Allowing users to choose between API outputs (text or chat) at start-up.
+
+- Not rewriting all of readme.md on my phone, but when I have time at home 😅.
+
+
+
+
 # Auto-PaLM
 
 Auto-PaLM is a Python-based AI program created with the help of GPT-4 and other LLMs. This was started from scratch. The program stores and manages the generated content in a memory system, allowing for context-aware responses and the ability to filter, archive, and retrieve information based on user input.
