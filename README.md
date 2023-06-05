@@ -1,6 +1,6 @@
 # Auto-PaLM
 
-Auto-PaLM (Automated Prompts and Learning Memory) is a Python-based AI program that leverages the power of generative AI to generate questions and answers based on user-defined prompts. The program also stores and manages the generated content in a memory system, allowing for context-aware responses and the ability to filter, archive, and retrieve information based on user input.
+Auto-PaLM is a Python-based AI program created with the help of GPT-4 and other LLMs. This was started from scratch. The program stores and manages the generated content in a memory system, allowing for context-aware responses and the ability to filter, archive, and retrieve information based on user input.
 
 ## Features
 
@@ -53,10 +53,10 @@ I welcome contributions to improve the Auto-PaLM program. Please feel free to su
 
 ## License
 
-(no clue?!)
+(no clue?!) if anyone has experience with this, please help! I want this to be openly accessable to everyone to copy, modify, edit, etc.
 
 ## A Special Thank You
 
 This project, Auto-PaLM, was greatly inspired by [Auto-GPT: An Autonomous GPT-4 Experiment](https://github.com/Significant-Gravitas/Auto-GPT) by Significant Gravitas. Auto-GPT showcased the capabilities of the GPT-4 language model and served as one of the first examples of an autonomous AI application. I deeply appreciate the work and innovation demonstrated by Auto-GPT and its contributors, as it has truly been a driving force and motivation for the development of Auto-PaLM.
 
-We're excited to see how both Auto-PaLM and Auto-GPT will continue to push the boundaries of what is possible with AI in the future!
+I'm so excited to see how both Auto-PaLM and Auto-GPT will continue to push the boundaries of what is possible with AI in the future!
