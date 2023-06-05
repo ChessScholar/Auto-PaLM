@@ -1,11 +1,15 @@
 Updated June 5, 2023
 
-Current focus:
+Please note that I'm solo on this project at the moment and will always welcome help. I'm still learning programming language and jargon. Thank you for your understanding and patience!
+
+Current tasks:
 - Correctly switching to google.generativeai functions instead of the mock-up functions provided by GPT-4 in its baby stages.
 
 - Refactoring all files to be easier to understand what each function does, and new files to shorten some of the larger ones.
 
 - Allowing users to choose between API outputs (text or chat) at start-up.
+
+- Making examples of how to use the program. 
 
 - Not rewriting all of readme.md on my phone, but when I have time at home 😅.
 
