@@ -1,125 +1,165 @@
-# main.py
 import os
-import logging
 import json
 import re
-import time
-import numpy as np
+import subprocess
+from dotenv import load_dotenv
 import google.generativeai as palm
-from concurrent.futures import ThreadPoolExecutor
-from goal_setting import set_clear_goals
-from memory import Memory
-from saved_memory import (save_memory, load_memory, archive_memory,
-                          detect_code_snippet, save_snippets_to_file, filter_memory)
-from welcome_screen import welcome_prompt, save_api_key
 
-def load_api_key():
-    with open("api_key.txt", "r") as f:
-        return f.read().strip()
+load_dotenv()
+palm.configure(api_key=os.environ['API_KEY'])
 
-api_key, num_prompts, memory_path, filter_context_threshold, archive_memory_threshold, filter_memory_threshold = welcome_prompt()
-save_api_key(api_key)
-palm.configure(api_key=load_api_key())
+class MemSys:
+    def __init__(self, mem_name="default"):
+        self.mem_name = mem_name
+        self.mem_fldr = os.path.join("memories", mem_name)
+        self.json_fldr = os.path.join(self.mem_fldr, "json_files")
+        self.mem_file = os.path.join(self.json_fldr, "long_term.json")
+        self.mem = {"initial_prompt": "", "tasks": [], "subts": [], "code_snips": []}
+        self.load_mem()
 
-# Load the memory from the .json file
-memory = load_memory(memory_path)
+    def create_mem(self, mem_name):
+        self.mem_name = mem_name
+        self.mem_fldr = os.path.join("memories", mem_name)
+        self.json_fldr = os.path.join(self.mem_fldr, "json_files")
+        self.mem_file = os.path.join(self.json_fldr, "long_term.json")
 
-# Get the embedding of the current prompt
-prompt = "Enter your current prompt here"
-_, prompt_embedding = memory.get_embedding(prompt)
+        if not os.path.exists(self.mem_fldr):
+            os.makedirs(self.mem_fldr)
+            os.makedirs(self.json_fldr)
 
-# Filter the memory based on relevancy
-filtered_memory = filter_memory(memory, prompt_embedding, threshold=filter_memory_threshold)
+        self.save_mem()
 
-# Save the filtered memory back to the .json file
-save_memory(filtered_memory, memory_path)
-models = [m for m in palm.list_models() if 'generateText' in m.supported_generation_methods]
-model = models[0].name
+    def load_mem(self):
+        if os.path.exists(self.mem_file):
+            with open(self.mem_file, "r") as f:
+                self.mem = json.load(f)
 
-max_iterations_per_minute = 30
-iteration_count = 0
-start_time = time.time()
+    def save_mem(self):
+        with open(self.mem_file, "w") as f:
+            json.dump(self.mem, f, indent=2)
 
-def generate_text(prompt):
-    global iteration_count, start_time
-    iteration_count += 1
-    if iteration_count > max_iterations_per_minute:
-        elapsed_time = time.time() - start_time
-        if elapsed_time < 60:
-            print("You have reached the 30 prompts/iterations per minute quota. The AI is waiting for the timer.")
-            time.sleep(60 - elapsed_time)
-        start_time = time.time()
-        iteration_count = 1
+    def upd_mem(self, key, value):
+        self.mem[key] = value
+        self.save_mem()
 
-    completion = palm.generate_text(model=model, prompt=prompt,
-                                    temperature=0.5, max_output_tokens=1000)
-    return completion.result.strip() if completion.result else None
+    def select_mem(self):
+        memories = [d for d in os.listdir("memories") if os.path.isdir(os.path.join("memories", d))]
+        print("Available memories:")
+        for i, mem in enumerate(memories):
+            print(f"{i + 1}. {mem}")
 
-def process_answer(question, answer, memory):
-    snippets = detect_code_snippet(answer)
-    if snippets:
-        save_snippets_to_file(snippets, memory_path)
-    memory.update_question(question, answer)
+        print(f"{len(memories) + 1}. Create a new mememory")
+        choice = int(input("Select a memory or create a new one: ")) - 1
 
-def AI():
-    goals = set_clear_goals()
-    print("\nGoals set:")
-    for goal in goals:
-        print(f"- {goal}")
-
-    # Load the memory from the .json file
-    memory = load_memory(memory_path)
-
-    prev_prompt = None
-    while True:
-        prompt = input("Enter your prompt or type 'exit' to quit: ")
-        if prompt.lower() == 'exit':
-            break
-        elif prompt.lower() == 'clear memory':
-            memory = Memory()
-            save_memory(memory, memory_path)
-            print("Memory cleared.")
-            continue
-
-        if not prompt.strip():
-            if prev_prompt:
-                prompt = prev_prompt
-                print(f"Using previous prompt: {prompt}")
-            else:
-                print("Please enter a valid prompt.")
-                continue
+        if choice < len(memories):
+            mem_name = memories[choice]
         else:
-            prev_prompt = prompt
+            mem_name = input("Enter a name for the new mem: ")
 
-        # vital: Updating memory with the new prompt
-        memory.update_prompt(prompt)
-        _, prompt_embedding = memory.get_embedding(prompt)
+        return mem_name
 
-        filtered_context = memory.filter_context(prompt_embedding, threshold=filter_context_threshold)
-        archive_memory(memory_path, threshold=archive_memory_threshold)
-        save_memory(memory, memory_path, num_prompts=num_prompts)
+class TaskGenerator:
+    def gen_ts(self, main_task):
+        prompt = f"What are the main steps in creating a {main_task}?"
+        tasks = palm.generate_text(prompt=prompt, temperature=0.0, max_output_tokens=800).result.split("\n")
+        return tasks
 
+    def gen_subts(self, task):
+        prompt = f"What are the main steps in completing the task: '{task}'?"
+        subts = palm.generate_text(prompt=prompt, temperature=0.0, max_output_tokens=800).result.split("\n")
+        return subts
+
+class CodeExecution:
+    def test_code_snip(self, code_snip, language, timeout=7):
         try:
-            num_iterations = int(input("Enter the number of iterations: "))
-        except ValueError:
-            print("Using default (1) iteration.")
-            num_iterations = 1
+            if language == "python":
+                result = subprocess.run(["python", "-c", code_snip], capture_output=True, text=True, check=True, timeout=timeout)
+                return True, result.stdout
+            else:
+                return False, "Unknown language."
+        except subprocess.CalledProcessError as e:
+            return False, e.stderr
+        except subprocess.TimeoutExpired:
+            return False, "Code execution timed out."
+        except Exception as e:
+            return False, str(e)
 
-        for _ in range(num_iterations):
-            question = generate_text(f"What is a question about {prompt}?")
-            if question not in memory.questions:
-                answer = generate_text(question)
-                if answer:
-                    process_answer(question, answer, memory)
-                    # Print the generated question and answer for each iteration
-                    print(f"\nIteration {_+1}:")
-                    print(f"Question: {question}\nAnswer: {answer}\n")
+    def process_task(task):
+        messages = [{"content": task}]
+        content = palm.chat(messages=messages, temperature=0.6, candidate_count=3, top_p=0.9).last
+        return content
 
-        for q, a in memory.questions.items():
-            print(f"Question: {q}\nAnswer: {a}\n")
+    def extract_code_snip(content):
+        code_snip = re.search(r'```python(.+?)```', content, re.DOTALL)
+        if code_snip:
+            code_snip = code_snip.group(1).strip()
+            return code_snip
+        return None
 
-    print("Goodbye!")
+def main():
+    initial_prompt = "Create the game 'pong' using the programming language: Python."
+    task_gen = TaskGenerator()
+    mem_sys = MemSys()
+    mem_name = mem_sys.select_mem()
 
+    if not os.path.exists(mem_sys.mem_file):
+        mem_sys.create_mem(mem_name)
+        
+    mem_sys.upd_mem("initial_prompt", initial_prompt)
+
+    tasks = task_gen.gen_ts(initial_prompt)
+    mem_sys.upd_mem("tasks", tasks)
+
+    for i, task in enumerate(tasks):
+        if not task.strip():
+            continue
+        print(f"Task {i + 1}: {task}")
+
+        subts = task_gen.gen_subts(task)
+        mem_sys.upd_mem(f"subts_{i + 1}", subts)
+
+        for j, subt in enumerate(subts):
+            if not subt.strip():
+                continue
+            print(f"  Subtask {i + 1}.{j + 1}: {subt}")
+
+            content = CodeExecution.process_task(subt)
+
+            if content is None:
+                print("Error: Chat model returned None")
+                continue
+
+            print(f"[Chat Model] {content}")
+
+            code_snip = CodeExecution.extract_code_snip(content)
+
+            if code_snip:
+                print(f"\nExtracted code snip:\n{code_snip}\n")
+                test_status, test_message = CodeExecution().test_code_snip(code_snip, "python")
+                if test_status:
+                    print(f"\nTask completed successfully:\n")
+                    print(code_snip)
+                else:
+                    print(f"\nError occurred while testing the code snip:\n{test_message}\n")
+
+                mem_sys.upd_mem(f"code_snip_{i + 1}_{j + 1}", code_snip)
 
 if __name__ == "__main__":
-    AI()
+    main()
+
+
+
+# subt = subtask
+# fldr = folder
+# mem = memory
+# mem_sys = memory system
+# upd = update
+# snip = snippet
+# gen = generate
+# ts = task
+# gen_ts = generate tasks
+# gen_subts = generate subtasks
+# mem_name = memory name
+# mem_fldr = memory folder
+# json_fldr = json folder
+# mem_file = memory file
