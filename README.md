@@ -1,19 +1,23 @@
-Updated June 5, 2023
+Updated June 18, 2023
 
-Please note that I'm solo on this project at the moment and will always welcome help. I'm still learning programming language and jargon. Thank you for your understanding and patience!
+_Please note that I'm solo on this project at the moment and will always welcome help. I'm still learning programming language and jargon. Thank you for your understanding and patience!_
 
-Current tasks:
-- Correctly switching to google.generativeai functions instead of the mock-up functions provided by GPT-4 in its baby stages.
+**# Changes, patch-2**
+* Removed multi-file for now. Everything is condensed into one main.py file. I'm currently working on patch-3 already where all the logic is separated into different files (and some new toys).
 
-- Refactoring all files to be easier to understand what each function does, and new files to shorten some of the larger ones.
+- Memories:
+	- Logic for creating new folders called "memories". Memories are saved as .json files "long_term". You can pick an old memory and continue working from there. 
+	- Memories will save to file all tasks created, the output of the Chat mode, and identify and save code snippets (currently only Python snippets).
 
-- Allowing users to choose between API outputs (text or chat) at start-up.
+- Code snippets:
+  - If a code snippet is successfully found, it will note in the terminal.
+  - If code snippet is successfully found, it will attempt to run the snippet from the terminal. Error messages are ignored at hte moment (implementing error checks).
+ 
+- Tasks and Subtasks:
+	- Chat model creates a task list based on the user's prompt. Currently only able to take an initial prompt and create Tasks for it. If a task is too vauge, it will create subtasks. The tasks are sent to the Text model with some context. The Text model will answer and give back to the Chat model. The Chat model will move on to the next task.
 
-- Making examples of how to use the program. 
-
-- Not rewriting all of readme.md on my phone, but when I have time at home 😅.
-
-
+ - Normal work:
+   - I'm specializing the Chat to work on auto-coding. But it is capable of doing other tasks as well. Have fun with it and let me know if you have suggestions or ideas to improve!
 
 
 # Auto-PaLM
